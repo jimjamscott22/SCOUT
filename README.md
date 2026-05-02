@@ -86,6 +86,8 @@ scout serve --host 0.0.0.0 --port 9000
 > **Warning:** Binding to `0.0.0.0` exposes SCOUT on your network. Use with caution.
 
 ---
+## Architecture Diagram
+![architecture diagram]("\img\SCOUT-MVP-System-architecture-diagram.png")
 
 ## Sources
 
