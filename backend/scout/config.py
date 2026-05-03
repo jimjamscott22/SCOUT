@@ -40,10 +40,11 @@ Usage
 
 from __future__ import annotations
 
+import contextlib
 import functools
-import sys
+import tomllib
 from pathlib import Path
-from typing import Any, ClassVar, Tuple, Type
+from typing import Any, ClassVar
 
 from pydantic import BaseModel, field_validator
 from pydantic_settings import BaseSettings, PydanticBaseSettingsSource, SettingsConfigDict
@@ -101,14 +102,6 @@ class _ScoutTomlSource(PydanticBaseSettingsSource):
         toml_path: Path = _self_module._CONFIG_FILE
         if not toml_path.exists():
             return {}
-
-        if sys.version_info >= (3, 11):
-            import tomllib
-        else:
-            try:
-                import tomllib  # type: ignore[no-redef]
-            except ImportError:
-                import tomli as tomllib  # type: ignore[no-redef]
 
         raw = tomllib.loads(toml_path.read_text(encoding="utf-8"))
 
@@ -177,12 +170,12 @@ class ScoutConfig(BaseSettings):
     @classmethod
     def settings_customise_sources(
         cls,
-        settings_cls: Type[BaseSettings],
+        settings_cls: type[BaseSettings],
         init_settings: PydanticBaseSettingsSource,
         env_settings: PydanticBaseSettingsSource,
         dotenv_settings: PydanticBaseSettingsSource,
         file_secret_settings: PydanticBaseSettingsSource,
-    ) -> Tuple[PydanticBaseSettingsSource, ...]:
+    ) -> tuple[PydanticBaseSettingsSource, ...]:
         """Load from env vars first, then TOML file, then defaults."""
         return (
             init_settings,
@@ -244,7 +237,5 @@ def write_default_config(path: Path) -> None:
     """
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(_DEFAULT_TOML, encoding="utf-8")
-    try:
+    with contextlib.suppress(NotImplementedError):
         path.chmod(0o600)
-    except NotImplementedError:
-        pass

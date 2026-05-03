@@ -2,14 +2,11 @@
 
 from __future__ import annotations
 
-import importlib
 from pathlib import Path
 
 import pytest
-
 import scout.config as config_module
-from scout.config import ScoutConfig, SourcesConfig, get_config, write_default_config
-
+from scout.config import ScoutConfig, get_config, write_default_config
 
 # ---------------------------------------------------------------------------
 # Helpers
