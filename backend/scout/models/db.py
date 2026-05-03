@@ -8,7 +8,7 @@ is created by `scout.db.init_db()`.
 
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from sqlalchemy import ForeignKey, UniqueConstraint
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
@@ -25,7 +25,7 @@ class Investigation(Base):
     mode: Mapped[str]
     target: Mapped[str]
     target_type: Mapped[str]
-    created_at: Mapped[datetime] = mapped_column(default=lambda: datetime.now(timezone.utc))
+    created_at: Mapped[datetime] = mapped_column(default=lambda: datetime.now(UTC))
     completed_at: Mapped[datetime | None] = mapped_column(default=None)
     status: Mapped[str] = mapped_column(default="running")
     note: Mapped[str | None] = mapped_column(default=None)

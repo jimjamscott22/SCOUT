@@ -59,13 +59,13 @@ def memory_engine() -> Generator[Engine, None, None]:
 # ---------------------------------------------------------------------------
 
 
-def test_init_db_creates_all_tables(memory_engine):
+def test_init_db_creates_all_tables(memory_engine: Engine) -> None:
     """All five expected tables must exist after init_db()."""
     init_db(memory_engine)
     assert EXPECTED_TABLES.issubset(_existing_tables(memory_engine))
 
 
-def test_init_db_creates_cache_indexes(memory_engine):
+def test_init_db_creates_cache_indexes(memory_engine: Engine) -> None:
     """idx_cache_expires and idx_cache_lookup must exist after init_db()."""
     init_db(memory_engine)
     indexes = _existing_indexes(memory_engine)
@@ -73,14 +73,14 @@ def test_init_db_creates_cache_indexes(memory_engine):
     assert "idx_cache_lookup" in indexes
 
 
-def test_init_db_is_idempotent(memory_engine):
+def test_init_db_is_idempotent(memory_engine: Engine) -> None:
     """Calling init_db() twice must not raise any exception."""
     init_db(memory_engine)
     init_db(memory_engine)  # must not raise
     assert EXPECTED_TABLES.issubset(_existing_tables(memory_engine))
 
 
-def test_get_engine_creates_in_memory_engine(tmp_path):
+def test_get_engine_creates_in_memory_engine(tmp_path: pytest.TempPathFactory) -> None:
     """get_engine() must return a working engine and create parent dirs."""
     db_file = tmp_path / "subdir" / "scout.db"
     engine = get_engine(db_file)
@@ -92,7 +92,7 @@ def test_get_engine_creates_in_memory_engine(tmp_path):
         engine.dispose()
 
 
-def test_get_session_factory_returns_usable_session(memory_engine):
+def test_get_session_factory_returns_usable_session(memory_engine: Engine) -> None:
     """get_session_factory() must return a sessionmaker that opens sessions."""
     init_db(memory_engine)
     SessionLocal = get_session_factory(memory_engine)
