@@ -52,7 +52,7 @@ class Node:
     id: str
     type: NodeType
     label: str
-    attrs: dict = field(default_factory=dict)
+    attrs: dict = field(default_factory=dict, hash=False, compare=False)
 
 
 @dataclass(frozen=True)
