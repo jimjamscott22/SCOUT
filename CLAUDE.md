@@ -34,7 +34,7 @@ backend/
     models/           # domain dataclasses + SQLAlchemy ORM models
     sources/          # plugin registry + source implementations
       footprint/      # HIBP, Gravatar, GitHub, crt.sh, ...
-      threat/         # VirusTotal, Shodan, WHOIS, passive DNS, ...
+      threat/         # VirusTotal, AbuseIPDB, dns_resolver, ...
     api/              # FastAPI routers
   tests/
 frontend/             # Vite + React app
@@ -49,7 +49,7 @@ Every data source implements the `Source` protocol and registers via `@register`
 All sources produce `Node` and `Edge` objects in a common normalized shape. Node types: `email`, `domain`, `ip`, `hash`, `url`, `breach`, `cert`, `repo`, `account`. Edge relations: `exposed_in`, `resolves_to`, `owns`, `references`, etc. Cytoscape renders the typed graph directly.
 
 ### TTL Cache
-Every source response is cached in SQLite with a configurable TTL (breach data: 24h, WHOIS: 7d, DNS: 1h). This is the primary mechanism for protecting free-tier API quotas during development.
+Every source response is cached in SQLite with a configurable TTL (breach data: 24h, DNS: 1h). This is the primary mechanism for protecting free-tier API quotas during development.
 
 ### Local-First
 - Server binds to `127.0.0.1` only by default
@@ -62,6 +62,7 @@ uv sync --extra dev          # install deps
 uv run scout serve           # start dev server
 uv run pytest                # run tests
 uv run ruff check .          # lint
+uv run ruff format --check . # format check
 uv run mypy backend/         # type check
 ```
 
@@ -71,7 +72,7 @@ This branch covers **Phase 1 (MVP)** only:
 - Domain models and SQLAlchemy ORM
 - Source registry and base protocol
 - 2-3 footprint sources (HIBP, Gravatar, crt.sh)
-- 2-3 threat sources (VirusTotal, WHOIS, DNS)
+- 2-3 threat sources (VirusTotal, AbuseIPDB, dns_resolver)
 - FastAPI REST API with investigation endpoints
 - React frontend with graph visualization (basic)
 - CLI with `serve` and `config` commands
