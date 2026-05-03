@@ -2,8 +2,10 @@
 
 from __future__ import annotations
 
+from collections.abc import Generator
+
 import pytest
-from sqlalchemy import create_engine, text
+from sqlalchemy import Engine, create_engine, text
 
 from scout.db import get_engine, get_session_factory, init_db
 
@@ -21,7 +23,7 @@ EXPECTED_TABLES = {
 }
 
 
-def _existing_tables(engine) -> set[str]:  # type: ignore[type-arg]
+def _existing_tables(engine: Engine) -> set[str]:
     """Return the set of user-created table names in the SQLite database."""
     with engine.connect() as conn:
         rows = conn.execute(
@@ -30,7 +32,7 @@ def _existing_tables(engine) -> set[str]:  # type: ignore[type-arg]
     return {row[0] for row in rows}
 
 
-def _existing_indexes(engine) -> set[str]:  # type: ignore[type-arg]
+def _existing_indexes(engine: Engine) -> set[str]:
     """Return the set of index names in the SQLite database."""
     with engine.connect() as conn:
         rows = conn.execute(
@@ -45,7 +47,7 @@ def _existing_indexes(engine) -> set[str]:  # type: ignore[type-arg]
 
 
 @pytest.fixture()
-def memory_engine():
+def memory_engine() -> Generator[Engine, None, None]:
     """In-memory SQLite engine — discarded after each test."""
     engine = create_engine("sqlite:///:memory:")
     yield engine
@@ -57,13 +59,13 @@ def memory_engine():
 # ---------------------------------------------------------------------------
 
 
-def test_init_db_creates_all_tables(memory_engine):  # type: ignore[no-untyped-def]
+def test_init_db_creates_all_tables(memory_engine):
     """All five expected tables must exist after init_db()."""
     init_db(memory_engine)
     assert EXPECTED_TABLES.issubset(_existing_tables(memory_engine))
 
 
-def test_init_db_creates_cache_indexes(memory_engine):  # type: ignore[no-untyped-def]
+def test_init_db_creates_cache_indexes(memory_engine):
     """idx_cache_expires and idx_cache_lookup must exist after init_db()."""
     init_db(memory_engine)
     indexes = _existing_indexes(memory_engine)
@@ -71,14 +73,14 @@ def test_init_db_creates_cache_indexes(memory_engine):  # type: ignore[no-untype
     assert "idx_cache_lookup" in indexes
 
 
-def test_init_db_is_idempotent(memory_engine):  # type: ignore[no-untyped-def]
+def test_init_db_is_idempotent(memory_engine):
     """Calling init_db() twice must not raise any exception."""
     init_db(memory_engine)
     init_db(memory_engine)  # must not raise
     assert EXPECTED_TABLES.issubset(_existing_tables(memory_engine))
 
 
-def test_get_engine_creates_in_memory_engine(tmp_path):  # type: ignore[no-untyped-def]
+def test_get_engine_creates_in_memory_engine(tmp_path):
     """get_engine() must return a working engine and create parent dirs."""
     db_file = tmp_path / "subdir" / "scout.db"
     engine = get_engine(db_file)
@@ -90,7 +92,7 @@ def test_get_engine_creates_in_memory_engine(tmp_path):  # type: ignore[no-untyp
         engine.dispose()
 
 
-def test_get_session_factory_returns_usable_session(memory_engine):  # type: ignore[no-untyped-def]
+def test_get_session_factory_returns_usable_session(memory_engine):
     """get_session_factory() must return a sessionmaker that opens sessions."""
     init_db(memory_engine)
     SessionLocal = get_session_factory(memory_engine)

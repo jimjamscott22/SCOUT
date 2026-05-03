@@ -8,8 +8,7 @@ is created by `scout.db.init_db()`.
 
 from __future__ import annotations
 
-from datetime import datetime
-from typing import Optional
+from datetime import datetime, timezone
 
 from sqlalchemy import ForeignKey, UniqueConstraint
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
@@ -26,10 +25,10 @@ class Investigation(Base):
     mode: Mapped[str]
     target: Mapped[str]
     target_type: Mapped[str]
-    created_at: Mapped[datetime] = mapped_column(default=datetime.utcnow)
-    completed_at: Mapped[Optional[datetime]] = mapped_column(default=None)
+    created_at: Mapped[datetime] = mapped_column(default=lambda: datetime.now(timezone.utc))
+    completed_at: Mapped[datetime | None] = mapped_column(default=None)
     status: Mapped[str] = mapped_column(default="running")
-    note: Mapped[Optional[str]] = mapped_column(default=None)
+    note: Mapped[str | None] = mapped_column(default=None)
 
 
 class SourceRun(Base):
@@ -41,9 +40,9 @@ class SourceRun(Base):
     )
     source_name: Mapped[str]
     started_at: Mapped[datetime]
-    finished_at: Mapped[Optional[datetime]] = mapped_column(default=None)
+    finished_at: Mapped[datetime | None] = mapped_column(default=None)
     status: Mapped[str]
-    error_message: Mapped[Optional[str]] = mapped_column(default=None)
+    error_message: Mapped[str | None] = mapped_column(default=None)
     cache_hit: Mapped[bool] = mapped_column(default=False)
 
 
