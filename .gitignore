@@ -1,5 +1,6 @@
 # ── Python ───────────────────────────────────────────────────────────────────
 __pycache__/
+*.pyc
 *.py[cod]
 *$py.class
 *.so
@@ -30,7 +31,8 @@ dmypy.json
 .coverage
 coverage.xml
 htmlcov/
-*.cassette          # VCR / pytest-recording HTTP fixtures go in tests/cassettes, not here
+*.cassette          # individual cassette files
+cassettes/          # VCR / pytest-recording HTTP fixture directories
 .tox/
 
 # ── Node / frontend ──────────────────────────────────────────────────────────
