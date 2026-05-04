@@ -1,7 +1,9 @@
 {
   "permissions": {
     "allow": [
-      "Bash(bash:*)"
+      "Bash(bash:*)",
+      "Bash(uv run *)",
+      "Bash(uv sync *)"
     ]
   }
 }
