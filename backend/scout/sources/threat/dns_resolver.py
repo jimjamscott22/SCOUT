@@ -10,7 +10,6 @@ ToS / usage notes:
 from __future__ import annotations
 
 import asyncio
-from typing import Any
 
 import dns.asyncresolver
 import dns.exception
@@ -36,7 +35,7 @@ async def _query(domain: str, rtype: str) -> list[str]:
         resolver.lifetime = _QUERY_TIMEOUT
         answer = await resolver.resolve(domain, rtype)
         return [str(r) for r in answer]
-    except (dns.exception.DNSException, asyncio.TimeoutError):
+    except (TimeoutError, dns.exception.DNSException):
         return []
 
 
@@ -75,7 +74,7 @@ class DnsResolverSource:
         records: dict[str, list[str]] = {}
         tasks = {rtype: _query(target, rtype) for rtype in _RECORD_TYPES}
         resolved = await asyncio.gather(*tasks.values(), return_exceptions=False)
-        for rtype, values in zip(tasks.keys(), resolved):
+        for rtype, values in zip(tasks.keys(), resolved, strict=True):
             records[rtype] = values
 
         result.raw = records

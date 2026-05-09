@@ -7,7 +7,7 @@ from pydantic import BaseModel
 
 from scout.config import get_config
 from scout.models.domain import InputType, Mode
-from scout.sources.base import Source, get_sources
+from scout.sources.base import get_sources
 
 router = APIRouter()
 
@@ -18,21 +18,6 @@ class SourceInfo(BaseModel):
     accepts: list[str]
     auth_required: bool
     configured: bool
-
-
-def _is_configured(src: Source) -> bool:
-    """Return True if the source has its required credentials in config."""
-    if not src.auth_required:
-        return True
-    cfg = get_config()
-    key = cfg.sources.__dict__.get(src.name, None)
-    if key is None:
-        # Try common key names
-        sources_dict = cfg.sources.model_dump()
-        entry = sources_dict.get(src.name, {})
-        token = entry.get("api_key") or entry.get("token") or ""
-        return bool(token)
-    return False
 
 
 @router.get("/api/sources", response_model=list[SourceInfo])

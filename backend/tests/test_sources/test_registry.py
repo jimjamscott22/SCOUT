@@ -3,18 +3,16 @@
 from __future__ import annotations
 
 import pytest
-
 from scout.models.domain import InputType, Mode, SourceResult
 from scout.sources.base import (
+    _REGISTRY,
     FetchContext,
     RateLimit,
     Source,
-    _REGISTRY,
     get_source,
     get_sources,
     register,
 )
-
 
 # ---------------------------------------------------------------------------
 # Helpers — minimal stub sources registered only within each test

@@ -2,15 +2,13 @@
 
 from __future__ import annotations
 
-from unittest.mock import AsyncMock, patch
+from unittest.mock import patch
 
 import pytest
-
 from scout.models.domain import InputType, Mode, NodeType
 from scout.sources.base import _REGISTRY, get_sources
 from scout.sources.threat import dns_resolver as _mod
 from scout.sources.threat.dns_resolver import DnsResolverSource
-
 
 # ---------------------------------------------------------------------------
 # Fixtures

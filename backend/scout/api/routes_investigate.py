@@ -6,6 +6,7 @@ GET  /api/investigations/{id}   — get results for one investigation
 
 from __future__ import annotations
 
+import json
 import uuid
 from datetime import UTC, datetime
 from typing import Any
@@ -181,7 +182,7 @@ async def investigate(
             investigation_id=inv_id,
             type=node.type,
             label=node.label,
-            attrs_json=str(node.attrs),
+            attrs_json=json.dumps(node.attrs),
             discovered_by=node.source_name,
         )
         session.add(nr)
@@ -304,7 +305,7 @@ async def get_investigation(
             for r in source_runs
         ],
         nodes=[
-            NodeOut(id=n.id, type=n.type, label=n.label, source_name=n.discovered_by, attrs={})
+            NodeOut(id=n.id, type=n.type, label=n.label, source_name=n.discovered_by, attrs=json.loads(n.attrs_json))
             for n in nodes
         ],
         edges=[

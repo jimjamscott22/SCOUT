@@ -1,0 +1,26 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --accent: #00ff88;
+  --bg: #0a0a0a;
+  --surface: #111111;
+  --border: #222222;
+  --text: #e0e0e0;
+  --muted: #666666;
+}
+
+body.footprint {
+  --accent: #00ff88;
+}
+
+body.threat {
+  --accent: #ffb000;
+}
+
+body {
+  background-color: var(--bg);
+  color: var(--text);
+  font-family: 'JetBrains Mono', 'Cascadia Code', 'Fira Code', monospace;
+}
