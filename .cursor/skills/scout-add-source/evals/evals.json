@@ -1,0 +1,17 @@
+{
+  "skill_name": "scout-add-source",
+  "evals": [
+    {
+      "id": 0,
+      "prompt": "Add crt.sh-style certificate transparency for domains — wait, we have crt.sh. Add a WHOIS/RDAP source for domain footprint lookups instead.",
+      "expected_output": "Follows @register checklist, references peer sources, includes test file and config/TTL steps; notes phase if out of MVP",
+      "files": []
+    },
+    {
+      "id": 1,
+      "prompt": "Integrate URLhaus for threat mode URL lookups.",
+      "expected_output": "New threat source module, Node/Edge mapping for URL/hash types, httpx via ctx.http, mocked tests",
+      "files": []
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "skill_name": "scout-app-review",
+  "evals": [
+    {
+      "id": 0,
+      "prompt": "Review SCOUT and suggest what to work on next for the MVP.",
+      "expected_output": "SCOUT-specific review respecting Phase 1 scope; mentions sources/orchestrator/frontend; runs uv run pytest",
+      "files": []
+    },
+    {
+      "id": 1,
+      "prompt": "Are there any security or API quota issues in how sources are fetched?",
+      "expected_output": "Focus on cache, rate limits, auth skip behavior, local-first defaults; file-level references",
+      "files": []
+    }
+  ]
+}

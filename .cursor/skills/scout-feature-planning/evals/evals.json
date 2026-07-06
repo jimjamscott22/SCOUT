@@ -1,0 +1,17 @@
+{
+  "skill_name": "scout-feature-planning",
+  "evals": [
+    {
+      "id": 0,
+      "prompt": "I want to add investigation history so I can re-open past lookups. Plan it out.",
+      "expected_output": "Full spec template with phase scope, files to touch, acceptance criteria, MVP slice vs deferrals",
+      "files": []
+    },
+    {
+      "id": 1,
+      "prompt": "Phase 2 idea: stream source results to the UI as they complete instead of waiting for all of them.",
+      "expected_output": "Classifies as infrastructure/cross-cutting; marks Phase 2; lists orchestrator + API + frontend touch points",
+      "files": []
+    }
+  ]
+}

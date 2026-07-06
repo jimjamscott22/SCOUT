@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SCOUT — API Keys &amp; Source Auth Guide</title>
+  <style>
+    :root {
+      --bg: #0d1117;
+      --surface: #161b22;
+      --surface-2: #1c2128;
+      --border: #30363d;
+      --text: #e6edf3;
+      --muted: #8b949e;
+      --accent: #58a6ff;
+      --green: #3fb950;
+      --amber: #d29922;
+      --red: #f85149;
+      --purple: #bc8cff;
+      --mono: "Cascadia Code", "Fira Code", "JetBrains Mono", Consolas, monospace;
+      --sans: "Segoe UI", system-ui, -apple-system, sans-serif;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: var(--sans);
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      padding: 2rem 1.5rem 4rem;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    header {
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    header h1 {
+      font-size: 1.75rem;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+    }
+
+    header h1 span { color: var(--accent); }
+
+    .subtitle {
+      color: var(--muted);
+      margin-top: 0.35rem;
+      font-size: 0.95rem;
+    }
+
+    .badge-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-top: 1rem;
+    }
+
+    .badge {
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      padding: 0.2rem 0.55rem;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+    }
+
+    .badge.footprint { color: var(--green); border-color: #238636; }
+    .badge.threat    { color: var(--red);   border-color: #da3633; }
+
+    section {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.25rem 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    section h2 {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+      color: var(--accent);
+    }
+
+    p, li { color: var(--text); font-size: 0.92rem; }
+    p { margin-bottom: 0.75rem; }
+    ul { padding-left: 1.25rem; margin-bottom: 0.75rem; }
+    li { margin-bottom: 0.35rem; color: var(--muted); }
+    li strong { color: var(--text); }
+
+    .table-wrap {
+      overflow-x: auto;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+    }
+
+    thead {
+      background: var(--surface-2);
+      position: sticky;
+      top: 0;
+    }
+
+    th {
+      text-align: left;
+      padding: 0.75rem 1rem;
+      font-weight: 600;
+      color: var(--muted);
+      text-transform: uppercase;
+      font-size: 0.7rem;
+      letter-spacing: 0.06em;
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+    }
+
+    td {
+      padding: 0.85rem 1rem;
+      border-bottom: 1px solid var(--border);
+      vertical-align: top;
+    }
+
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: rgba(88, 166, 255, 0.04); }
+
+    .source-name {
+      font-weight: 600;
+      color: var(--text);
+      display: block;
+    }
+
+    .source-id {
+      font-family: var(--mono);
+      font-size: 0.75rem;
+      color: var(--purple);
+      margin-top: 0.15rem;
+    }
+
+    .mode-pill {
+      display: inline-block;
+      font-size: 0.7rem;
+      font-weight: 600;
+      padding: 0.15rem 0.45rem;
+      border-radius: 4px;
+      margin-right: 0.25rem;
+    }
+
+    .mode-pill.footprint { background: rgba(63, 185, 80, 0.15); color: var(--green); }
+    .mode-pill.threat    { background: rgba(248, 81, 73, 0.15); color: var(--red); }
+
+    .auth-yes  { color: var(--amber); font-weight: 600; }
+    .auth-no   { color: var(--green); font-weight: 600; }
+    .cost-paid { color: var(--amber); }
+    .cost-free { color: var(--green); }
+
+    code, .config-block {
+      font-family: var(--mono);
+      font-size: 0.8rem;
+    }
+
+    code {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      padding: 0.1rem 0.35rem;
+      border-radius: 4px;
+      color: var(--accent);
+    }
+
+    .config-block {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 1rem 1.25rem;
+      overflow-x: auto;
+      color: var(--muted);
+      line-height: 1.7;
+      white-space: pre;
+    }
+
+    .config-block .key   { color: var(--purple); }
+    .config-block .val   { color: var(--green); }
+    .config-block .cmt   { color: #484f58; }
+
+    a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    a:hover { text-decoration: underline; }
+
+    .steps {
+      list-style: none;
+      padding: 0;
+      counter-reset: step;
+    }
+
+    .steps li {
+      counter-increment: step;
+      padding-left: 2rem;
+      position: relative;
+      margin-bottom: 0.5rem;
+    }
+
+    .steps li::before {
+      content: counter(step);
+      position: absolute;
+      left: 0;
+      width: 1.4rem;
+      height: 1.4rem;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 50%;
+      font-size: 0.7rem;
+      font-weight: 700;
+      color: var(--accent);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      top: 0.1rem;
+    }
+
+    .callout {
+      border-left: 3px solid var(--amber);
+      background: rgba(210, 153, 34, 0.08);
+      padding: 0.75rem 1rem;
+      border-radius: 0 6px 6px 0;
+      margin-top: 0.75rem;
+      font-size: 0.88rem;
+      color: var(--muted);
+    }
+
+    .callout strong { color: var(--amber); }
+
+    .input-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 0.75rem;
+    }
+
+    .input-card {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 0.85rem 1rem;
+    }
+
+    .input-card h3 {
+      font-size: 0.8rem;
+      color: var(--accent);
+      margin-bottom: 0.4rem;
+      font-family: var(--mono);
+    }
+
+    .input-card p {
+      font-size: 0.82rem;
+      color: var(--muted);
+      margin: 0;
+    }
+
+    footer {
+      margin-top: 2rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--border);
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1><span>SCOUT</span> — API Keys &amp; Source Auth</h1>
+    <p class="subtitle">
+      Self-audit &amp; Cyber Observation Unified Toolkit · MVP Phase 1 sources
+    </p>
+    <div class="badge-row">
+      <span class="badge footprint">Footprint mode</span>
+      <span class="badge threat">Threat mode</span>
+    </div>
+  </header>
+
+  <section>
+    <h2>Overview</h2>
+    <p>
+      SCOUT stores credentials in <code>~/.scout/config.toml</code> only — never in
+      environment variables or the repository. On Windows that path is
+      <code>C:\Users\&lt;you&gt;\.scout\config.toml</code>.
+    </p>
+    <div class="callout">
+      <strong>Graceful skip:</strong> Sources without a configured key return empty
+      results and log <code>status=skipped</code>. They never crash an investigation.
+    </div>
+  </section>
+
+  <section>
+    <h2>All MVP Sources</h2>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Source</th>
+            <th>Mode</th>
+            <th>Input</th>
+            <th>Auth</th>
+            <th>Cost</th>
+            <th>Config section</th>
+            <th>Field</th>
+            <th>Provider limits</th>
+            <th>How to obtain</th>
+          </tr>
+        </thead>
+        <tbody>
+
+          <tr>
+            <td>
+              <span class="source-name">Have I Been Pwned</span>
+              <span class="source-id">haveibeenpwned</span>
+            </td>
+            <td><span class="mode-pill footprint">Footprint</span></td>
+            <td><code>email</code></td>
+            <td class="auth-yes">API key</td>
+            <td class="cost-paid">Paid (~$4/mo)</td>
+            <td><code>[sources.hibp]</code></td>
+            <td><code>api_key</code></td>
+            <td>Per-key HIBP v3 limits</td>
+            <td>
+              <a href="https://haveibeenpwned.com/API/Key" target="_blank" rel="noopener">
+                haveibeenpwned.com/API/Key
+              </a><br />
+              Create account → purchase API key (Pwned 1 tier). Website search ≠ API access.
+            </td>
+          </tr>
+
+          <tr>
+            <td>
+              <span class="source-name">Gravatar</span>
+              <span class="source-id">gravatar</span>
+            </td>
+            <td><span class="mode-pill footprint">Footprint</span></td>
+            <td><code>email</code></td>
+            <td class="auth-no">None</td>
+            <td class="cost-free">Free</td>
+            <td>—</td>
+            <td>—</td>
+            <td>Public JSON API, no published limit</td>
+            <td>No signup required. Works immediately.</td>
+          </tr>
+
+          <tr>
+            <td>
+              <span class="source-name">GitHub User API</span>
+              <span class="source-id">github_user</span>
+            </td>
+            <td><span class="mode-pill footprint">Footprint</span></td>
+            <td><code>username</code></td>
+            <td class="auth-yes">PAT (token)</td>
+            <td class="cost-free">Free</td>
+            <td><code>[sources.github]</code></td>
+            <td><code>token</code></td>
+            <td>5,000 req/hr authenticated<br />60 req/hr without token</td>
+            <td>
+              <a href="https://github.com/settings/tokens" target="_blank" rel="noopener">
+                github.com/settings/tokens
+              </a><br />
+              Generate classic PAT. Public profile/repo reads need minimal or no scopes.
+            </td>
+          </tr>
+
+          <tr>
+            <td>
+              <span class="source-name">crt.sh</span>
+              <span class="source-id">crt_sh</span>
+            </td>
+            <td><span class="mode-pill footprint">Footprint</span></td>
+            <td><code>domain</code></td>
+            <td class="auth-no">None</td>
+            <td class="cost-free">Free</td>
+            <td>—</td>
+            <td>—</td>
+            <td>Community resource; be conservative</td>
+            <td>No signup. Public CT log API by Sectigo.</td>
+          </tr>
+
+          <tr>
+            <td>
+              <span class="source-name">AbuseIPDB</span>
+              <span class="source-id">abuseipdb</span>
+            </td>
+            <td><span class="mode-pill threat">Threat</span></td>
+            <td><code>ip</code></td>
+            <td class="auth-yes">API key</td>
+            <td class="cost-free">Free tier</td>
+            <td><code>[sources.abuseipdb]</code></td>
+            <td><code>api_key</code></td>
+            <td>1,000 checks/day (free)</td>
+            <td>
+              <a href="https://www.abuseipdb.com/account/api" target="_blank" rel="noopener">
+                abuseipdb.com/account/api
+              </a><br />
+              Free account → verify email → create API key.
+            </td>
+          </tr>
+
+          <tr>
+            <td>
+              <span class="source-name">VirusTotal</span>
+              <span class="source-id">virustotal</span>
+            </td>
+            <td><span class="mode-pill threat">Threat</span></td>
+            <td><code>ip</code>, <code>domain</code></td>
+            <td class="auth-yes">API key</td>
+            <td class="cost-free">Free tier</td>
+            <td><code>[sources.virustotal]</code></td>
+            <td><code>api_key</code></td>
+            <td>4 lookups/min, 500/day (free)</td>
+            <td>
+              <a href="https://www.virustotal.com/gui/my-apikey" target="_blank" rel="noopener">
+                virustotal.com/gui/my-apikey
+              </a><br />
+              Free signup → Profile → My API Key.
+            </td>
+          </tr>
+
+          <tr>
+            <td>
+              <span class="source-name">DNS Resolver</span>
+              <span class="source-id">dns_resolver</span>
+            </td>
+            <td><span class="mode-pill threat">Threat</span></td>
+            <td><code>domain</code></td>
+            <td class="auth-no">None</td>
+            <td class="cost-free">Free</td>
+            <td>—</td>
+            <td>—</td>
+            <td>Local/system DNS</td>
+            <td>No signup. Resolves via system DNS stack.</td>
+          </tr>
+
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <h2>Which sources run per input type?</h2>
+    <div class="input-grid">
+      <div class="input-card">
+        <h3>email</h3>
+        <p>Have I Been Pwned · Gravatar</p>
+      </div>
+      <div class="input-card">
+        <h3>username</h3>
+        <p>GitHub User API</p>
+      </div>
+      <div class="input-card">
+        <h3>domain</h3>
+        <p>crt.sh (footprint) · VirusTotal · DNS Resolver (threat)</p>
+      </div>
+      <div class="input-card">
+        <h3>ip</h3>
+        <p>AbuseIPDB · VirusTotal</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Setup workflow</h2>
+    <ol class="steps">
+      <li>Initialize config: <code>scout config init</code></li>
+      <li>Edit <code>~/.scout/config.toml</code> and paste your keys</li>
+      <li>Verify (keys redacted): <code>scout config show</code></li>
+      <li>Start server: <code>scout serve</code> → open <a href="http://127.0.0.1:8765">http://127.0.0.1:8765</a></li>
+    </ol>
+
+    <h2 style="margin-top: 1.25rem; margin-bottom: 0.75rem; font-size: 0.95rem; color: var(--text);">
+      Example config.toml
+    </h2>
+    <div class="config-block"><span class="key">[scout]</span>
+db_path = <span class="val">"~/.scout/scout.db"</span>
+host    = <span class="val">"127.0.0.1"</span>
+port    = <span class="val">8765</span>
+
+<span class="key">[sources.hibp]</span>
+api_key = <span class="val">"your-hibp-key"</span>       <span class="cmt"># https://haveibeenpwned.com/API/Key</span>
+
+<span class="key">[sources.virustotal]</span>
+api_key = <span class="val">"your-vt-key"</span>         <span class="cmt"># https://www.virustotal.com/gui/my-apikey</span>
+
+<span class="key">[sources.abuseipdb]</span>
+api_key = <span class="val">"your-abuseipdb-key"</span>  <span class="cmt"># https://www.abuseipdb.com/account/api</span>
+
+<span class="key">[sources.github]</span>
+token   = <span class="val">"ghp_..."</span>             <span class="cmt"># https://github.com/settings/tokens</span></div>
+  </section>
+
+  <section>
+    <h2>Step-by-step: authenticated sources</h2>
+
+    <h3 style="font-size:0.9rem; margin:1rem 0 0.5rem; color:var(--green);">Have I Been Pwned (paid)</h3>
+    <ul>
+      <li>Register at <a href="https://haveibeenpwned.com">haveibeenpwned.com</a></li>
+      <li>Go to <strong>API Key</strong> and purchase the Pwned 1 monthly tier</li>
+      <li>Copy key → <code>[sources.hibp] api_key</code></li>
+      <li>Header sent: <code>hibp-api-key</code></li>
+    </ul>
+
+    <h3 style="font-size:0.9rem; margin:1rem 0 0.5rem; color:var(--green);">VirusTotal (free)</h3>
+    <ul>
+      <li>Sign up at <a href="https://www.virustotal.com">virustotal.com</a></li>
+      <li>Open <strong>My API Key</strong> from your profile</li>
+      <li>Copy key → <code>[sources.virustotal] api_key</code></li>
+      <li>Header sent: <code>x-apikey</code></li>
+    </ul>
+
+    <h3 style="font-size:0.9rem; margin:1rem 0 0.5rem; color:var(--green);">AbuseIPDB (free)</h3>
+    <ul>
+      <li>Create account at <a href="https://www.abuseipdb.com">abuseipdb.com</a></li>
+      <li>Navigate to <strong>Account → API</strong></li>
+      <li>Create and copy key → <code>[sources.abuseipdb] api_key</code></li>
+      <li>Header sent: <code>Key</code></li>
+    </ul>
+
+    <h3 style="font-size:0.9rem; margin:1rem 0 0.5rem; color:var(--green);">GitHub PAT (free)</h3>
+    <ul>
+      <li>Go to <a href="https://github.com/settings/tokens">GitHub token settings</a></li>
+      <li><strong>Generate new token (classic)</strong></li>
+      <li>For public user/repo data, no special scopes are usually required</li>
+      <li>Copy token → <code>[sources.github] token</code> (note: field is <code>token</code>, not <code>api_key</code>)</li>
+      <li>Header sent: <code>Authorization: Bearer …</code></li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>Recommended starting point</h2>
+    <ul>
+      <li><strong>Zero cost:</strong> Gravatar, crt.sh, DNS resolver work with no keys</li>
+      <li><strong>Free keys first:</strong> VirusTotal + AbuseIPDB unlock full threat-mode IP lookups</li>
+      <li><strong>GitHub token:</strong> Unlocks footprint username investigations</li>
+      <li><strong>HIBP last:</strong> Only paid source; add when you need breach data for emails you own</li>
+    </ul>
+    <div class="callout">
+      <strong>Security:</strong> Keep <code>config.toml</code> private. SCOUT binds to
+      <code>127.0.0.1</code> by default — local-only, single-user.
+    </div>
+  </section>
+
+  <footer>
+    SCOUT MVP Phase 1 · Config path: <code>~/.scout/config.toml</code>
+  </footer>
+
+</body>
+</html>
