@@ -89,7 +89,7 @@ def test_config_loads_from_toml(tmp_path: Path, monkeypatch: pytest.MonkeyPatch)
     """Values present in a TOML file must override the defaults."""
     toml_file = tmp_path / "config.toml"
     toml_file.write_text(
-        "[scout]\nport = 9999\nhost = \"0.0.0.0\"\n",
+        '[scout]\nport = 9999\nhost = "0.0.0.0"\n',
         encoding="utf-8",
     )
     monkeypatch.setattr(config_module, "_CONFIG_FILE", toml_file)

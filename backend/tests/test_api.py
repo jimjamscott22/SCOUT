@@ -2,18 +2,15 @@
 
 from __future__ import annotations
 
-from pathlib import Path
 from unittest.mock import AsyncMock, patch
 
 import pytest
 from fastapi.testclient import TestClient
-
 from scout.cache import ResponseCache
-from scout.db import get_engine, get_session_factory, init_db
+from scout.db import get_session_factory, init_db
 from scout.main import app
-from scout.models.domain import Edge, InputType, Mode, Node, NodeType, SourceResult
+from scout.models.domain import Node, NodeType
 from scout.orchestrator import OrchestratorResult, SourceRunResult
-
 
 # ---------------------------------------------------------------------------
 # Shared in-memory DB + cache fixtures
@@ -46,7 +43,6 @@ def test_cache(session_factory):
 
 @pytest.fixture(scope="module")
 def client(db_engine, session_factory, test_cache):
-    from sqlalchemy.orm import Session
 
     def _override_session():
         with session_factory() as s:
@@ -110,7 +106,9 @@ def test_list_sources_invalid_mode(client):
 
 
 def _mock_orch_result(domain: str = "example.com") -> OrchestratorResult:
-    node = Node(id=f"domain:{domain}", type=NodeType.DOMAIN, label=domain, source_name="dns_resolver")
+    node = Node(
+        id=f"domain:{domain}", type=NodeType.DOMAIN, label=domain, source_name="dns_resolver"
+    )
     run = SourceRunResult(
         source_name="dns_resolver",
         status="ok",
@@ -127,11 +125,14 @@ def test_investigate_returns_200(client):
     with patch("scout.api.routes_investigate.Orchestrator") as MockOrch:
         instance = MockOrch.return_value
         instance.run = AsyncMock(return_value=mock_result)
-        r = client.post("/api/investigate", json={
-            "mode": "threat",
-            "target": "example.com",
-            "target_type": "domain",
-        })
+        r = client.post(
+            "/api/investigate",
+            json={
+                "mode": "threat",
+                "target": "example.com",
+                "target_type": "domain",
+            },
+        )
     assert r.status_code == 200
 
 
@@ -140,11 +141,14 @@ def test_investigate_response_shape(client):
     with patch("scout.api.routes_investigate.Orchestrator") as MockOrch:
         instance = MockOrch.return_value
         instance.run = AsyncMock(return_value=mock_result)
-        r = client.post("/api/investigate", json={
-            "mode": "threat",
-            "target": "example.com",
-            "target_type": "domain",
-        })
+        r = client.post(
+            "/api/investigate",
+            json={
+                "mode": "threat",
+                "target": "example.com",
+                "target_type": "domain",
+            },
+        )
     body = r.json()
     assert "id" in body
     assert body["mode"] == "threat"
@@ -156,20 +160,26 @@ def test_investigate_response_shape(client):
 
 
 def test_investigate_invalid_mode(client):
-    r = client.post("/api/investigate", json={
-        "mode": "banana",
-        "target": "example.com",
-        "target_type": "domain",
-    })
+    r = client.post(
+        "/api/investigate",
+        json={
+            "mode": "banana",
+            "target": "example.com",
+            "target_type": "domain",
+        },
+    )
     assert r.status_code == 422
 
 
 def test_investigate_invalid_target_type(client):
-    r = client.post("/api/investigate", json={
-        "mode": "threat",
-        "target": "example.com",
-        "target_type": "fridge",
-    })
+    r = client.post(
+        "/api/investigate",
+        json={
+            "mode": "threat",
+            "target": "example.com",
+            "target_type": "fridge",
+        },
+    )
     assert r.status_code == 422
 
 
@@ -196,11 +206,14 @@ def test_get_investigation_round_trip(client):
     with patch("scout.api.routes_investigate.Orchestrator") as MockOrch:
         instance = MockOrch.return_value
         instance.run = AsyncMock(return_value=mock_result)
-        post_r = client.post("/api/investigate", json={
-            "mode": "threat",
-            "target": "roundtrip.com",
-            "target_type": "domain",
-        })
+        post_r = client.post(
+            "/api/investigate",
+            json={
+                "mode": "threat",
+                "target": "roundtrip.com",
+                "target_type": "domain",
+            },
+        )
     assert post_r.status_code == 200
     inv_id = post_r.json()["id"]
 
@@ -217,11 +230,14 @@ def test_list_investigations_shows_created(client):
     with patch("scout.api.routes_investigate.Orchestrator") as MockOrch:
         instance = MockOrch.return_value
         instance.run = AsyncMock(return_value=mock_result)
-        client.post("/api/investigate", json={
-            "mode": "footprint",
-            "target": "listed.com",
-            "target_type": "domain",
-        })
+        client.post(
+            "/api/investigate",
+            json={
+                "mode": "footprint",
+                "target": "listed.com",
+                "target_type": "domain",
+            },
+        )
 
     r = client.get("/api/investigations")
     targets = [inv["target"] for inv in r.json()]

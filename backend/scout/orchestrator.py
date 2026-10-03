@@ -25,8 +25,7 @@ from __future__ import annotations
 
 import asyncio
 import dataclasses
-import json
-from typing import Sequence
+from collections.abc import Sequence
 
 import httpx
 
@@ -37,8 +36,8 @@ from scout.sources.base import FetchContext, Source, get_sources
 
 # TTL defaults per mode (seconds).  Callers can override via ttl_override.
 _DEFAULT_TTL: dict[str, float] = {
-    "dns_resolver": 3_600,       # 1 h
-    "haveibeenpwned": 86_400,    # 24 h
+    "dns_resolver": 3_600,  # 1 h
+    "haveibeenpwned": 86_400,  # 24 h
     "gravatar": 86_400,
     "github_user": 3_600,
     "crt_sh": 86_400,
@@ -53,7 +52,7 @@ class SourceRunResult:
     """Outcome of running one source against one target."""
 
     source_name: str
-    status: str          # "ok" | "error" | "skipped" | "cache_hit"
+    status: str  # "ok" | "error" | "skipped" | "cache_hit"
     cache_hit: bool
     error_message: str | None
     nodes: list[Node]
@@ -65,8 +64,8 @@ class OrchestratorResult:
     """Merged result of all source runs for a single investigation."""
 
     source_runs: list[SourceRunResult]
-    nodes: list[Node]    # deduplicated by Node.id
-    edges: list[Edge]    # deduplicated by (src_id, dst_id, relation)
+    nodes: list[Node]  # deduplicated by Node.id
+    edges: list[Edge]  # deduplicated by (src_id, dst_id, relation)
 
 
 def _request_key(input_type: InputType, target: str) -> str:

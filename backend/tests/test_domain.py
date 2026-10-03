@@ -1,9 +1,6 @@
 """Tests for scout.models.domain."""
 
-import pytest
-
 from scout.models.domain import Edge, InputType, Mode, Node, NodeType, SourceResult
-
 
 # ---------------------------------------------------------------------------
 # Node equality and hashing
@@ -62,8 +59,12 @@ def test_edge_usable_in_set():
 
 def test_edge_same_src_dst_relation_different_source_deduplicate():
     """Two edges with same src/dst/relation but different source_name must deduplicate."""
-    e1 = Edge(src_id="email:a@b.com", dst_id="breach:adobe", relation="exposed_in", source_name="hibp")
-    e2 = Edge(src_id="email:a@b.com", dst_id="breach:adobe", relation="exposed_in", source_name="other")
+    e1 = Edge(
+        src_id="email:a@b.com", dst_id="breach:adobe", relation="exposed_in", source_name="hibp"
+    )
+    e2 = Edge(
+        src_id="email:a@b.com", dst_id="breach:adobe", relation="exposed_in", source_name="other"
+    )
     assert e1 == e2
     assert hash(e1) == hash(e2)
     assert len({e1, e2}) == 1

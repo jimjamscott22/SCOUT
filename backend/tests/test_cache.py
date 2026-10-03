@@ -7,10 +7,8 @@ from pathlib import Path
 from unittest.mock import patch
 
 import pytest
-
 from scout.cache import ResponseCache, _cache_id
 from scout.db import get_engine, get_session_factory, init_db
-from scout.models.db import ResponseCache as ResponseCacheRow
 
 
 @pytest.fixture()

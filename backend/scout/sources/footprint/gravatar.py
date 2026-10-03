@@ -49,11 +49,7 @@ class GravatarSource:
         result.raw = data
 
         entry = data.get("entry", [{}])[0]
-        display_name = (
-            entry.get("displayName")
-            or entry.get("preferredUsername")
-            or email_hash[:8]
-        )
+        display_name = entry.get("displayName") or entry.get("preferredUsername") or email_hash[:8]
 
         account_node = Node(
             id=f"account:gravatar:{email_hash}",

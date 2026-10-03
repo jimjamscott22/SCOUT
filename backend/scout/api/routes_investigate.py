@@ -118,12 +118,14 @@ async def investigate(
     try:
         mode = Mode(req.mode)
     except ValueError:
-        raise HTTPException(status_code=422, detail=f"Unknown mode: {req.mode!r}")
+        raise HTTPException(status_code=422, detail=f"Unknown mode: {req.mode!r}") from None
 
     try:
         input_type = InputType(req.target_type)
     except ValueError:
-        raise HTTPException(status_code=422, detail=f"Unknown target_type: {req.target_type!r}")
+        raise HTTPException(
+            status_code=422, detail=f"Unknown target_type: {req.target_type!r}"
+        ) from None
 
     inv_id = str(uuid.uuid4())
     now = datetime.now(UTC)
@@ -229,7 +231,9 @@ async def investigate(
             for n in orch_result.nodes
         ],
         edges=[
-            EdgeOut(src_id=e.src_id, dst_id=e.dst_id, relation=e.relation, source_name=e.source_name)
+            EdgeOut(
+                src_id=e.src_id, dst_id=e.dst_id, relation=e.relation, source_name=e.source_name
+            )
             for e in orch_result.edges
         ],
     )
@@ -271,20 +275,10 @@ async def get_investigation(
         raise HTTPException(status_code=404, detail="Investigation not found")
 
     source_runs = (
-        session.query(SourceRun)
-        .filter(SourceRun.investigation_id == investigation_id)
-        .all()
+        session.query(SourceRun).filter(SourceRun.investigation_id == investigation_id).all()
     )
-    nodes = (
-        session.query(NodeRow)
-        .filter(NodeRow.investigation_id == investigation_id)
-        .all()
-    )
-    edges = (
-        session.query(EdgeRow)
-        .filter(EdgeRow.investigation_id == investigation_id)
-        .all()
-    )
+    nodes = session.query(NodeRow).filter(NodeRow.investigation_id == investigation_id).all()
+    edges = session.query(EdgeRow).filter(EdgeRow.investigation_id == investigation_id).all()
 
     return InvestigationOut(
         id=inv.id,
@@ -305,7 +299,13 @@ async def get_investigation(
             for r in source_runs
         ],
         nodes=[
-            NodeOut(id=n.id, type=n.type, label=n.label, source_name=n.discovered_by, attrs=json.loads(n.attrs_json))
+            NodeOut(
+                id=n.id,
+                type=n.type,
+                label=n.label,
+                source_name=n.discovered_by,
+                attrs=json.loads(n.attrs_json),
+            )
             for n in nodes
         ],
         edges=[

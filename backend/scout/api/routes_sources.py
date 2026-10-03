@@ -6,7 +6,7 @@ from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 
 from scout.config import get_config
-from scout.models.domain import InputType, Mode
+from scout.models.domain import Mode
 from scout.sources.base import get_sources
 
 router = APIRouter()
@@ -26,7 +26,7 @@ async def list_sources(mode: str | None = None) -> list[SourceInfo]:
         try:
             mode_enum: Mode | None = Mode(mode)
         except ValueError:
-            raise HTTPException(status_code=422, detail=f"Unknown mode: {mode!r}")
+            raise HTTPException(status_code=422, detail=f"Unknown mode: {mode!r}") from None
     else:
         mode_enum = None
     sources = get_sources(mode=mode_enum)

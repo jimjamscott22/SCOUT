@@ -2,13 +2,10 @@
 
 from __future__ import annotations
 
-import functools
 from pathlib import Path
 
-import pytest
-from typer.testing import CliRunner
-
 from scout.cli import app
+from typer.testing import CliRunner
 
 runner = CliRunner()
 
@@ -57,11 +54,10 @@ def test_config_init_no_overwrite_without_force(tmp_path: Path):
 
     from unittest.mock import patch
 
-    with patch("scout.config._CONFIG_FILE", existing):
-        with patch("scout.cli.Path") as MockPath:
-            MockPath.home.return_value = tmp_path
-            # Simulate config already existing
-            result = runner.invoke(app, ["config", "init"])
+    with patch("scout.config._CONFIG_FILE", existing), patch("scout.cli.Path") as MockPath:
+        MockPath.home.return_value = tmp_path
+        # Simulate config already existing
+        runner.invoke(app, ["config", "init"])
 
     # Should exit with non-zero when file exists and no --force
     # (we can't easily mock Path.home in the CLI, so just check the

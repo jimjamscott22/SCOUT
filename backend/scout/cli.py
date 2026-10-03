@@ -10,7 +10,6 @@ scout config init  Write a default config file to ~/.scout/config.toml
 
 from __future__ import annotations
 
-import sys
 from pathlib import Path
 
 import typer
@@ -78,8 +77,12 @@ def config_show() -> None:
     typer.echo("")
     typer.echo("[sources]")
     typer.echo(f"  hibp.api_key       : {'<set>' if cfg.sources.hibp.api_key else '<not set>'}")
-    typer.echo(f"  virustotal.api_key : {'<set>' if cfg.sources.virustotal.api_key else '<not set>'}")
-    typer.echo(f"  abuseipdb.api_key  : {'<set>' if cfg.sources.abuseipdb.api_key else '<not set>'}")
+    typer.echo(
+        f"  virustotal.api_key : {'<set>' if cfg.sources.virustotal.api_key else '<not set>'}"
+    )
+    typer.echo(
+        f"  abuseipdb.api_key  : {'<set>' if cfg.sources.abuseipdb.api_key else '<not set>'}"
+    )
     typer.echo(f"  github.token       : {'<set>' if cfg.sources.github.token else '<not set>'}")
 
 

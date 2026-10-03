@@ -105,11 +105,7 @@ class ResponseCache:
         """Delete all expired entries and return the count removed."""
         with self._factory() as session:
             now = datetime.now(UTC)
-            rows = (
-                session.query(ResponseCacheRow)
-                .filter(ResponseCacheRow.expires_at <= now)
-                .all()
-            )
+            rows = session.query(ResponseCacheRow).filter(ResponseCacheRow.expires_at <= now).all()
             for row in rows:
                 session.delete(row)
             session.commit()

@@ -2,10 +2,7 @@
 
 from __future__ import annotations
 
-import asyncio
-
 import pytest
-
 from scout.rate_limit import _LIMITERS, get_limiter, reset_limiters
 from scout.sources.base import RateLimit
 

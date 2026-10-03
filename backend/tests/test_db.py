@@ -5,10 +5,8 @@ from __future__ import annotations
 from collections.abc import Generator
 
 import pytest
-from sqlalchemy import Engine, create_engine, text
-
 from scout.db import get_engine, get_session_factory, init_db
-
+from sqlalchemy import Engine, create_engine, text
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -26,18 +24,14 @@ EXPECTED_TABLES = {
 def _existing_tables(engine: Engine) -> set[str]:
     """Return the set of user-created table names in the SQLite database."""
     with engine.connect() as conn:
-        rows = conn.execute(
-            text("SELECT name FROM sqlite_master WHERE type='table'")
-        ).fetchall()
+        rows = conn.execute(text("SELECT name FROM sqlite_master WHERE type='table'")).fetchall()
     return {row[0] for row in rows}
 
 
 def _existing_indexes(engine: Engine) -> set[str]:
     """Return the set of index names in the SQLite database."""
     with engine.connect() as conn:
-        rows = conn.execute(
-            text("SELECT name FROM sqlite_master WHERE type='index'")
-        ).fetchall()
+        rows = conn.execute(text("SELECT name FROM sqlite_master WHERE type='index'")).fetchall()
     return {row[0] for row in rows}
 
 

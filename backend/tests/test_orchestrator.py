@@ -7,14 +7,12 @@ from unittest.mock import AsyncMock, patch
 
 import httpx
 import pytest
-
 from scout.cache import ResponseCache
 from scout.db import get_engine, get_session_factory, init_db
 from scout.models.domain import Edge, InputType, Mode, Node, NodeType, SourceResult
-from scout.orchestrator import Orchestrator, OrchestratorResult, _merge, _serialize, _deserialize
+from scout.orchestrator import Orchestrator, _deserialize, _merge, _serialize
 from scout.rate_limit import reset_limiters
-from scout.sources.base import FetchContext, RateLimit, Source, _REGISTRY
-
+from scout.sources.base import FetchContext, RateLimit, Source
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -52,8 +50,17 @@ def _make_source(
 
 def _simple_result(source_name: str, domain: str = "example.com") -> SourceResult:
     sr = SourceResult(source_name=source_name)
-    sr.nodes.append(Node(id=f"domain:{domain}", type=NodeType.DOMAIN, label=domain, source_name=source_name))
-    sr.edges.append(Edge(src_id=f"domain:{domain}", dst_id="ip:1.2.3.4", relation="resolves_to", source_name=source_name))
+    sr.nodes.append(
+        Node(id=f"domain:{domain}", type=NodeType.DOMAIN, label=domain, source_name=source_name)
+    )
+    sr.edges.append(
+        Edge(
+            src_id=f"domain:{domain}",
+            dst_id="ip:1.2.3.4",
+            relation="resolves_to",
+            source_name=source_name,
+        )
+    )
     return sr
 
 
@@ -161,8 +168,11 @@ async def test_run_filters_by_source_names(http_client):
     orch = Orchestrator()
     with patch("scout.orchestrator.get_sources", return_value=[src_a, src_b]):
         result = await orch.run(
-            Mode.THREAT, "example.com", InputType.DOMAIN,
-            http=http_client, source_names=["filter_a"],
+            Mode.THREAT,
+            "example.com",
+            InputType.DOMAIN,
+            http=http_client,
+            source_names=["filter_a"],
         )
 
     names = {r.source_name for r in result.source_runs}
@@ -192,7 +202,9 @@ async def test_run_merges_nodes_across_sources(http_client):
 
 @pytest.mark.asyncio
 async def test_run_captures_source_errors(http_client):
-    failing = _make_source("bad_src", {Mode.THREAT}, {InputType.DOMAIN}, _simple_result("bad_src"), fail=True)
+    failing = _make_source(
+        "bad_src", {Mode.THREAT}, {InputType.DOMAIN}, _simple_result("bad_src"), fail=True
+    )
 
     orch = Orchestrator()
     with patch("scout.orchestrator.get_sources", return_value=[failing]):
@@ -207,15 +219,21 @@ async def test_run_captures_source_errors(http_client):
 @pytest.mark.asyncio
 async def test_run_skips_auth_required_without_key(http_client):
     auth_src = _make_source(
-        "needs_key", {Mode.THREAT}, {InputType.DOMAIN},
-        _simple_result("needs_key"), auth_required=True,
+        "needs_key",
+        {Mode.THREAT},
+        {InputType.DOMAIN},
+        _simple_result("needs_key"),
+        auth_required=True,
     )
 
     orch = Orchestrator()
     with patch("scout.orchestrator.get_sources", return_value=[auth_src]):
         result = await orch.run(
-            Mode.THREAT, "example.com", InputType.DOMAIN,
-            http=http_client, api_keys={},
+            Mode.THREAT,
+            "example.com",
+            InputType.DOMAIN,
+            http=http_client,
+            api_keys={},
         )
 
     run = result.source_runs[0]
@@ -226,15 +244,21 @@ async def test_run_skips_auth_required_without_key(http_client):
 @pytest.mark.asyncio
 async def test_run_uses_auth_required_source_when_key_present(http_client):
     auth_src = _make_source(
-        "keyed_src", {Mode.THREAT}, {InputType.DOMAIN},
-        _simple_result("keyed_src"), auth_required=True,
+        "keyed_src",
+        {Mode.THREAT},
+        {InputType.DOMAIN},
+        _simple_result("keyed_src"),
+        auth_required=True,
     )
 
     orch = Orchestrator()
     with patch("scout.orchestrator.get_sources", return_value=[auth_src]):
         result = await orch.run(
-            Mode.THREAT, "example.com", InputType.DOMAIN,
-            http=http_client, api_keys={"keyed_src": "secret"},
+            Mode.THREAT,
+            "example.com",
+            InputType.DOMAIN,
+            http=http_client,
+            api_keys={"keyed_src": "secret"},
         )
 
     run = result.source_runs[0]
