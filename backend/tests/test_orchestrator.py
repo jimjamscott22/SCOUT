@@ -118,6 +118,37 @@ def test_merge_skips_error_runs():
     assert edges == []
 
 
+def test_merge_combines_attrs_from_different_sources():
+    from scout.orchestrator import SourceRunResult
+
+    dns = Node(
+        id="domain:x.com",
+        type=NodeType.DOMAIN,
+        label="x.com",
+        source_name="dns",
+        attrs={"records": 3, "reputation": None},
+    )
+    vt = Node(
+        id="domain:x.com",
+        type=NodeType.DOMAIN,
+        label="x.com",
+        source_name="vt",
+        attrs={"malicious": 5, "reputation": -2},
+    )
+    nodes, _ = _merge(
+        [
+            SourceRunResult("dns", "ok", False, None, [dns], []),
+            SourceRunResult("vt", "ok", False, None, [vt], []),
+        ]
+    )
+    assert len(nodes) == 1
+    # first source wins on conflict; missing keys are filled from later sources
+    assert nodes[0].attrs == {"records": 3, "reputation": None, "malicious": 5}
+    assert nodes[0].source_name == "dns"
+    # originals untouched (they may be cached)
+    assert dns.attrs == {"records": 3, "reputation": None}
+
+
 def test_merge_includes_cache_hit_runs():
     from scout.orchestrator import SourceRunResult
 

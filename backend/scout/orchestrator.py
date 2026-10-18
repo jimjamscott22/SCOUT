@@ -72,7 +72,12 @@ def _request_key(input_type: InputType, target: str) -> str:
 
 
 def _merge(runs: list[SourceRunResult]) -> tuple[list[Node], list[Edge]]:
-    """Deduplicate nodes and edges from all successful runs."""
+    """Deduplicate nodes and edges from all successful runs.
+
+    When several sources emit the same node id, their attrs are combined: the
+    first source's value wins on a key conflict, later sources only add keys
+    that are missing. Input nodes are never mutated (they may be cached).
+    """
     seen_nodes: dict[str, Node] = {}
     seen_edges: set[Edge] = set()
 
@@ -80,8 +85,13 @@ def _merge(runs: list[SourceRunResult]) -> tuple[list[Node], list[Edge]]:
         if run.status not in ("ok", "cache_hit"):
             continue
         for node in run.nodes:
-            if node.id not in seen_nodes:
+            existing = seen_nodes.get(node.id)
+            if existing is None:
                 seen_nodes[node.id] = node
+            elif extra := {k: v for k, v in node.attrs.items() if k not in existing.attrs}:
+                seen_nodes[node.id] = dataclasses.replace(
+                    existing, attrs={**existing.attrs, **extra}
+                )
         for edge in run.edges:
             seen_edges.add(edge)
 
