@@ -9,10 +9,9 @@ Full roadmap and design: `docs/SCOUT_PROJECT_PLAN.md`.
 Work happens directly on `main` (the old `feature/mvp-phase1` branch and worktree no longer exist).
 
 **Phase 1 (MVP) is mostly complete:**
-- Done: scaffold, domain models, ORM, config loader, TTL cache, rate limiter, orchestrator, source registry, FastAPI API, CLI (`serve`, `config show`, `config init`), 7 sources, React frontend scaffold. 162 tests pass.
+- Done: scaffold, domain models, ORM, config loader, TTL cache, rate limiter, orchestrator, source registry, FastAPI API, CLI (`serve`, `config show`, `config init`), 6 sources (gravatar, github_user, crt_sh, virustotal, abuseipdb, dns_resolver), React frontend scaffold, request validation/normalisation (`scout/validation.py`). Per-source status is shown in `ResultsList.tsx`.
 - Remaining to close out Phase 1:
   - `ruff check .` and `mypy backend/` report errors (mostly fixable lint issues and missing test annotations)
-  - Frontend `SourceStatus.tsx` component (which sources ran / hit / missed / errored) not yet written
   - `whois_rdap` threat source (in the plan's MVP list) not yet written
   - End-to-end smoke test of frontend against backend not yet done
   - FastAPI does not yet serve the built frontend (`frontend/dist`); run Vite separately for now

@@ -13,7 +13,7 @@ from typing import Any
 
 import httpx
 from fastapi import APIRouter, Depends, HTTPException
-from pydantic import BaseModel
+from pydantic import BaseModel, model_validator
 from sqlalchemy.orm import Session
 
 from scout.cache import ResponseCache
@@ -22,6 +22,7 @@ from scout.db import get_engine, get_session_factory, init_db
 from scout.models.db import EdgeRow, Investigation, NodeRow, SourceRun
 from scout.models.domain import InputType, Mode
 from scout.orchestrator import Orchestrator
+from scout.validation import normalise_target
 
 router = APIRouter()
 
@@ -53,10 +54,17 @@ def _get_cache() -> ResponseCache:
 
 
 class InvestigateRequest(BaseModel):
-    mode: str
+    mode: Mode
     target: str
-    target_type: str
+    target_type: InputType
     sources: list[str] | None = None
+
+    @model_validator(mode="after")
+    def _normalise_target(self) -> InvestigateRequest:
+        # Runs after field coercion so target_type is already a valid InputType.
+        # ValueError becomes a 422 response.
+        self.target = normalise_target(self.target_type, self.target)
+        return self
 
 
 class NodeOut(BaseModel):
@@ -115,17 +123,8 @@ async def investigate(
     session: Session = Depends(_get_session),
     cache: ResponseCache = Depends(_get_cache),
 ) -> InvestigationOut:
-    try:
-        mode = Mode(req.mode)
-    except ValueError:
-        raise HTTPException(status_code=422, detail=f"Unknown mode: {req.mode!r}") from None
-
-    try:
-        input_type = InputType(req.target_type)
-    except ValueError:
-        raise HTTPException(
-            status_code=422, detail=f"Unknown target_type: {req.target_type!r}"
-        ) from None
+    mode = req.mode
+    input_type = req.target_type
 
     inv_id = str(uuid.uuid4())
     now = datetime.now(UTC)

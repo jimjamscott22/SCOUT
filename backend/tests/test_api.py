@@ -171,6 +171,33 @@ def test_investigate_invalid_mode(client):
     assert r.status_code == 422
 
 
+@pytest.mark.parametrize(
+    ("target_type", "target"),
+    [("username", "../orgs/x"), ("username", "a?b=c"), ("domain", "foo.com/../x"), ("ip", "nope")],
+)
+def test_investigate_rejects_malformed_target(client, target_type, target):
+    with patch("scout.api.routes_investigate.Orchestrator") as MockOrch:
+        r = client.post(
+            "/api/investigate",
+            json={"mode": "threat", "target": target, "target_type": target_type},
+        )
+        MockOrch.return_value.run.assert_not_called()
+    assert r.status_code == 422
+
+
+def test_investigate_normalises_target_before_running(client):
+    with patch("scout.api.routes_investigate.Orchestrator") as MockOrch:
+        instance = MockOrch.return_value
+        instance.run = AsyncMock(return_value=_mock_orch_result())
+        r = client.post(
+            "/api/investigate",
+            json={"mode": "threat", "target": " Example.COM ", "target_type": "domain"},
+        )
+    assert r.status_code == 200
+    assert r.json()["target"] == "example.com"
+    assert instance.run.call_args.kwargs["target"] == "example.com"
+
+
 def test_investigate_invalid_target_type(client):
     r = client.post(
         "/api/investigate",
