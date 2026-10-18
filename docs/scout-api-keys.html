@@ -344,7 +344,7 @@
             </td>
             <td><span class="mode-pill footprint">Footprint</span></td>
             <td><code>username</code></td>
-            <td class="auth-yes">PAT (token)</td>
+            <td class="auth-no">Optional PAT</td>
             <td class="cost-free">Free</td>
             <td><code>[sources.github]</code></td>
             <td><code>token</code></td>
@@ -500,7 +500,7 @@ token   = <span class="val">"ghp_..."</span>             <span class="cmt"># htt
       <li>Header sent: <code>Key</code></li>
     </ul>
 
-    <h3 style="font-size:0.9rem; margin:1rem 0 0.5rem; color:var(--green);">GitHub PAT (free)</h3>
+    <h3 style="font-size:0.9rem; margin:1rem 0 0.5rem; color:var(--green);">GitHub PAT (free, optional)</h3>
     <ul>
       <li>Go to <a href="https://github.com/settings/tokens">GitHub token settings</a></li>
       <li><strong>Generate new token (classic)</strong></li>
@@ -515,7 +515,7 @@ token   = <span class="val">"ghp_..."</span>             <span class="cmt"># htt
     <ul>
       <li><strong>Zero cost:</strong> Gravatar, crt.sh, DNS resolver work with no keys</li>
       <li><strong>Free keys first:</strong> VirusTotal + AbuseIPDB unlock full threat-mode IP lookups</li>
-      <li><strong>GitHub token:</strong> Unlocks footprint username investigations</li>
+      <li><strong>GitHub token (optional):</strong> Username lookups work without one (60 req/hr); a token raises that to 5,000 req/hr</li>
     </ul>
     <div class="callout">
       <strong>Security:</strong> Keep <code>config.toml</code> private. SCOUT binds to

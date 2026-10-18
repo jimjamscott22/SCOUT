@@ -75,8 +75,26 @@ def test_github_user_in_footprint_username_sources():
     assert any(s.name == "github_user" for s in sources)
 
 
-def test_github_user_is_auth_required(source):
-    assert source.auth_required
+def test_github_user_token_is_optional(source):
+    assert not source.auth_required
+
+
+@pytest.mark.asyncio
+async def test_fetch_sends_bearer_header_when_token_set(source, ctx):
+    ctx.http.get.side_effect = [_mock_response(200, _FAKE_USER), _mock_response(200, [])]
+    await source.fetch(_USERNAME, ctx)
+    assert (
+        ctx.http.get.call_args_list[0].kwargs["headers"]["Authorization"] == "Bearer ghp_testtoken"
+    )
+
+
+@pytest.mark.asyncio
+async def test_fetch_omits_auth_header_without_token(source):
+    http = AsyncMock()
+    http.get.side_effect = [_mock_response(200, _FAKE_USER), _mock_response(200, [])]
+    await source.fetch(_USERNAME, FetchContext(http=http, api_keys={"github_user": ""}))
+    for call in http.get.call_args_list:
+        assert "Authorization" not in call.kwargs["headers"]
 
 
 # ---------------------------------------------------------------------------

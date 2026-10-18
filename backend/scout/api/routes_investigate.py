@@ -6,15 +6,17 @@ GET  /api/investigations/{id}   — get results for one investigation
 
 from __future__ import annotations
 
+import functools
 import json
 import uuid
+from collections.abc import Iterator
 from datetime import UTC, datetime
 from typing import Any
 
 import httpx
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, model_validator
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, sessionmaker
 
 from scout.cache import ResponseCache
 from scout.config import get_config
@@ -32,20 +34,21 @@ router = APIRouter()
 # ---------------------------------------------------------------------------
 
 
-def _get_session() -> Session:
-    cfg = get_config()
-    engine = get_engine(cfg.db_path)
+@functools.lru_cache(maxsize=1)
+def _session_factory() -> sessionmaker[Session]:
+    """Build the engine and run init_db once per process, not once per request."""
+    engine = get_engine(get_config().db_path)
     init_db(engine)
-    factory = get_session_factory(engine)
-    with factory() as session:
+    return get_session_factory(engine)
+
+
+def _get_session() -> Iterator[Session]:
+    with _session_factory()() as session:
         yield session
 
 
 def _get_cache() -> ResponseCache:
-    cfg = get_config()
-    engine = get_engine(cfg.db_path)
-    init_db(engine)
-    return ResponseCache(get_session_factory(engine))
+    return ResponseCache(_session_factory())
 
 
 # ---------------------------------------------------------------------------

@@ -349,3 +349,17 @@ async def test_run_without_cache_always_fetches(http_client):
         await orch.run(Mode.THREAT, "example.com", InputType.DOMAIN, http=http_client)
 
     assert fetch_mock.call_count == 2
+
+
+@pytest.mark.asyncio
+async def test_broken_cache_does_not_fail_the_run(http_client):
+    src = _make_source("s", {Mode.THREAT}, {InputType.DOMAIN}, _simple_result("s"))
+    broken = AsyncMock(spec=ResponseCache)
+    broken.get.side_effect = RuntimeError("db locked")
+    broken.set.side_effect = RuntimeError("db locked")
+    with patch("scout.orchestrator.get_sources", return_value=[src]):
+        result = await Orchestrator(cache=broken).run(
+            Mode.THREAT, "example.com", InputType.DOMAIN, http_client
+        )
+    assert result.source_runs[0].status == "ok"
+    assert len(result.nodes) == 1

@@ -63,7 +63,14 @@ class ResponseCache:
                 session.delete(row)
                 session.commit()
                 return None
-            return json.loads(row.response_json)  # type: ignore[no-any-return]
+            try:
+                data = json.loads(row.response_json)
+            except json.JSONDecodeError:
+                # Corrupt row: drop it so the next lookup is a clean miss.
+                session.delete(row)
+                session.commit()
+                return None
+            return data  # type: ignore[no-any-return]
 
     def set(
         self,

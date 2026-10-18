@@ -25,6 +25,7 @@ from __future__ import annotations
 
 import asyncio
 import dataclasses
+import logging
 from collections.abc import Sequence
 
 import httpx
@@ -33,6 +34,8 @@ from scout.cache import ResponseCache
 from scout.models.domain import Edge, InputType, Mode, Node, SourceResult
 from scout.rate_limit import get_limiter
 from scout.sources.base import FetchContext, Source, get_sources
+
+logger = logging.getLogger(__name__)
 
 # TTL defaults per mode (seconds).  Callers can override via ttl_override.
 _DEFAULT_TTL: dict[str, float] = {
@@ -161,17 +164,22 @@ class Orchestrator:
         req_key = _request_key(input_type, target)
 
         # Cache read
+        # A broken cache must never fail the request: treat any problem as a miss.
         if self._cache is not None:
-            cached = self._cache.get(source.name, req_key)
-            if cached is not None:
-                sr = _deserialize(source.name, cached)
+            try:
+                cached = self._cache.get(source.name, req_key)
+                cached_sr = _deserialize(source.name, cached) if cached is not None else None
+            except Exception:
+                logger.warning("cache read failed for %s; refetching", source.name, exc_info=True)
+                cached_sr = None
+            if cached_sr is not None:
                 return SourceRunResult(
                     source_name=source.name,
                     status="cache_hit",
                     cache_hit=True,
                     error_message=None,
-                    nodes=sr.nodes,
-                    edges=sr.edges,
+                    nodes=cached_sr.nodes,
+                    edges=cached_sr.edges,
                 )
 
         # Live fetch (rate-limited)
@@ -192,7 +200,10 @@ class Orchestrator:
         # Cache write
         if self._cache is not None:
             ttl = self._ttl.get(source.name, _FALLBACK_TTL)
-            self._cache.set(source.name, req_key, _serialize(sr), ttl_seconds=ttl)
+            try:
+                self._cache.set(source.name, req_key, _serialize(sr), ttl_seconds=ttl)
+            except Exception:
+                logger.warning("cache write failed for %s", source.name, exc_info=True)
 
         return SourceRunResult(
             source_name=source.name,

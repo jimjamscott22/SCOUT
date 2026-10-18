@@ -2,10 +2,11 @@
 GitHub user source — user profile and public (non-fork) repositories.
 
 ToS / usage notes:
-  - Requires a personal access token (PAT). Header: ``Authorization: Bearer {token}``.
-  - Without a token the orchestrator skips this source.
+  - A personal access token (PAT) is optional. When configured it is sent as
+    ``Authorization: Bearer {token}``.
   - 404 means the username does not exist.
-  - Free-tier rate limit: 5,000 requests/hour authenticated.
+  - Rate limit: 5,000 requests/hour authenticated, 60/hour without a token
+    (each investigation costs 2 requests). Exhausting it surfaces as an error run.
   - See https://docs.github.com/en/rest/users/users for API docs.
 """
 
@@ -25,13 +26,13 @@ class GitHubUserSource:
     name = "github_user"
     modes = {Mode.FOOTPRINT}
     accepts = {InputType.USERNAME}
-    auth_required = True
+    auth_required = False
     rate_limit = RateLimit(requests=30, window_seconds=60)
 
     async def fetch(self, target: str, ctx: FetchContext) -> SourceResult:
         result = SourceResult(source_name=self.name)
         token = ctx.api_keys.get(self.name, "")
-        headers = {**_HEADERS, "Authorization": f"Bearer {token}"}
+        headers = {**_HEADERS, "Authorization": f"Bearer {token}"} if token else dict(_HEADERS)
 
         user_resp = await ctx.http.get(f"{_API_BASE}/users/{target}", headers=headers)
         if user_resp.status_code == 404:

@@ -152,3 +152,16 @@ def test_evict_expired_preserves_valid_entries(cache: ResponseCache):
         cache.evict_expired()
 
     assert cache.get("hibp", "email:keep@b.com") == {"keep": True}
+
+
+def test_get_corrupt_row_is_a_miss_and_is_deleted(cache):
+    from scout.cache import _cache_id
+    from scout.models.db import ResponseCache as Row
+
+    cache.set("gravatar", "email:a@b.com", {"ok": True}, ttl_seconds=3600)
+    with cache._factory() as s:
+        s.get(Row, _cache_id("gravatar", "email:a@b.com")).response_json = "{not json"
+        s.commit()
+    assert cache.get("gravatar", "email:a@b.com") is None
+    with cache._factory() as s:
+        assert s.get(Row, _cache_id("gravatar", "email:a@b.com")) is None
