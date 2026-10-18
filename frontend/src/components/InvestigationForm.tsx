@@ -30,7 +30,7 @@ export function InvestigationForm({ mode, onResult }: Props) {
   }, [mode])
 
   const mutation = useMutation({
-    mutationFn: () => postInvestigate({ mode, target, target_type: targetType }),
+    mutationFn: () => postInvestigate({ mode, target: target.trim(), target_type: targetType }),
     onSuccess: onResult,
   })
 
@@ -75,7 +75,7 @@ export function InvestigationForm({ mode, onResult }: Props) {
 
       {mutation.isError && (
         <span className="text-red-400 text-xs ml-2">
-          {String(mutation.error)}
+          {mutation.error.message}
         </span>
       )}
     </form>

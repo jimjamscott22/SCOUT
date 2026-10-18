@@ -4,7 +4,19 @@ import { ModeToggle } from './components/ModeToggle'
 import { NodeDetailPanel } from './components/NodeDetailPanel'
 import { ResultsGraph } from './components/ResultsGraph'
 import { ResultsList } from './components/ResultsList'
-import type { InvestigationOut, Mode, NodeOut } from './types/api'
+import type { InvestigationOut, Mode, NodeOut, SourceRunOut } from './types/api'
+
+/** Explain why an investigation produced no nodes. */
+function describeEmpty(runs: SourceRunOut[]): string {
+  if (runs.length === 0) return 'No sources support this target type in this mode.'
+  if (runs.every((r) => r.status === 'skipped')) {
+    return 'Every source was skipped — they need API keys. Run `scout config init` and add keys to ~/.scout/config.toml.'
+  }
+  if (runs.some((r) => r.status === 'error')) {
+    return 'No results, and some sources errored. See the source list for details.'
+  }
+  return 'No data found for this target.'
+}
 
 export default function App() {
   const [mode, setMode] = useState<Mode>('footprint')
@@ -59,11 +71,19 @@ export default function App() {
           <>
             {/* Left pane — Cytoscape graph */}
             <div className="flex-1 relative overflow-hidden">
-              <ResultsGraph
-                nodes={result.nodes}
-                edges={result.edges}
-                onNodeClick={handleNodeClick}
-              />
+              {result.nodes.length === 0 ? (
+                <div className="h-full flex items-center justify-center px-8">
+                  <p className="text-[var(--muted)] text-sm text-center max-w-md">
+                    {describeEmpty(result.source_runs)}
+                  </p>
+                </div>
+              ) : (
+                <ResultsGraph
+                  nodes={result.nodes}
+                  edges={result.edges}
+                  onNodeClick={handleNodeClick}
+                />
+              )}
               {selectedNode != null && (
                 <NodeDetailPanel
                   node={selectedNode}
