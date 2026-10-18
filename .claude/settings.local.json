@@ -3,7 +3,13 @@
     "allow": [
       "Bash(bash:*)",
       "Bash(uv run *)",
-      "Bash(uv sync *)"
+      "Bash(uv sync *)",
+      "mcp__fff__multi_grep",
+      "Bash(sed -n 8,40p scout/config.py)",
+      "Bash(sed -n 50,80p scout/config.py)",
+      "Bash(sed -n 205,225p scout/config.py)",
+      "Bash(sed -n 135,155p scout/api/routes_investigate.py)",
+      "Bash(sed -n 72,84p scout/cli.py)"
     ]
   }
 }

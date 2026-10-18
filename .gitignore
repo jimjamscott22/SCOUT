@@ -71,3 +71,5 @@ logs/
 # ── Git worktrees ─────────────────────────────────────────────────────────────
 .worktrees/
 .claude/settings.local.json
+
+.graphify/
