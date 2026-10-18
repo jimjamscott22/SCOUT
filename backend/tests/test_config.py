@@ -51,7 +51,6 @@ def test_default_sources_are_empty_strings(tmp_path: Path, monkeypatch: pytest.M
     """All source API key / token defaults must be empty strings."""
     monkeypatch.setattr(config_module, "_CONFIG_FILE", tmp_path / "nonexistent.toml")
     cfg = ScoutConfig()
-    assert cfg.sources.hibp.api_key == ""
     assert cfg.sources.virustotal.api_key == ""
     assert cfg.sources.abuseipdb.api_key == ""
     assert cfg.sources.github.token == ""
@@ -129,7 +128,6 @@ def test_write_default_config_contains_expected_keys(tmp_path: Path) -> None:
     assert "db_path" in content
     assert "host" in content
     assert "port" in content
-    assert "[sources.hibp]" in content
     assert "[sources.virustotal]" in content
     assert "[sources.abuseipdb]" in content
     assert "[sources.github]" in content
@@ -145,7 +143,7 @@ def test_write_default_config_is_valid_toml(tmp_path: Path) -> None:
 
     assert data["scout"]["port"] == 8765
     assert data["scout"]["host"] == "127.0.0.1"
-    assert data["sources"]["hibp"]["api_key"] == ""
+    assert data["sources"]["virustotal"]["api_key"] == ""
     assert data["sources"]["github"]["token"] == ""
 
 

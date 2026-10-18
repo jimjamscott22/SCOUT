@@ -37,7 +37,6 @@ from scout.sources.base import FetchContext, Source, get_sources
 # TTL defaults per mode (seconds).  Callers can override via ttl_override.
 _DEFAULT_TTL: dict[str, float] = {
     "dns_resolver": 3_600,  # 1 h
-    "haveibeenpwned": 86_400,  # 24 h
     "gravatar": 86_400,
     "github_user": 3_600,
     "crt_sh": 86_400,

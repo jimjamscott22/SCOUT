@@ -50,7 +50,7 @@ backend/
     orchestrator.py   # fan-out, caching, rate limiting, graph merge
     models/           # domain.py (dataclasses) + db.py (SQLAlchemy ORM)
     sources/          # base.py (protocol + registry) + implementations
-      footprint/      # hibp, gravatar, github_user, crt_sh
+      footprint/      # gravatar, github_user, crt_sh
       threat/         # virustotal, abuseipdb, dns_resolver
     api/              # routes_health, routes_sources, routes_investigate
   tests/              # mirrors package layout; sources in tests/test_sources/

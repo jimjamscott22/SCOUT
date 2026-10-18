@@ -143,7 +143,6 @@ async def investigate(
 
     cfg = get_config()
     api_keys = {
-        "haveibeenpwned": cfg.sources.hibp.api_key,
         "virustotal": cfg.sources.virustotal.api_key,
         "abuseipdb": cfg.sources.abuseipdb.api_key,
         "github_user": cfg.sources.github.token,

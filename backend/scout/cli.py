@@ -76,7 +76,6 @@ def config_show() -> None:
     typer.echo(f"port    : {cfg.port}")
     typer.echo("")
     typer.echo("[sources]")
-    typer.echo(f"  hibp.api_key       : {'<set>' if cfg.sources.hibp.api_key else '<not set>'}")
     typer.echo(
         f"  virustotal.api_key : {'<set>' if cfg.sources.virustotal.api_key else '<not set>'}"
     )

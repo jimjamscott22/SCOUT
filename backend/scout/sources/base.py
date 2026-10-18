@@ -96,8 +96,8 @@ def register(cls: type) -> type:
     Example::
 
         @register
-        class HibpSource:
-            name = "haveibeenpwned"
+        class GravatarSource:
+            name = "gravatar"
             ...
     """
     instance: Source = cls()

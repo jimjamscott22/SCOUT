@@ -48,9 +48,6 @@ db_path = "~/.scout/scout.db"
 host = "127.0.0.1"
 port = 8765
 
-[sources.hibp]
-api_key = ""          # https://haveibeenpwned.com/API/Key
-
 [sources.virustotal]
 api_key = ""          # https://www.virustotal.com/gui/my-apikey
 
@@ -95,7 +92,6 @@ scout serve --host 0.0.0.0 --port 9000
 
 | Source | Input | Auth | Phase |
 |---|---|---|---|
-| HaveIBeenPwned | email | API key | MVP |
 | Gravatar | email | None | MVP |
 | GitHub user API | username | PAT (free) | MVP |
 

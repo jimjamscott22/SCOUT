@@ -4,7 +4,7 @@ description: >-
   Adds a new OSINT data source plugin to SCOUT following the @register protocol,
   graph model, cache TTL, config, and test patterns. Use when the user wants to
   add a source, integrate a new API, extend footprint or threat mode, or
-  implement HIBP/VirusTotal-style fetch logic for another provider.
+  implement VirusTotal-style fetch logic for another provider.
 disable-model-invocation: true
 ---
 
@@ -26,7 +26,7 @@ Gather (ask if missing):
 | API docs URL | for response parsing |
 
 Read a similar existing source:
-- Footprint + auth: `backend/scout/sources/footprint/hibp.py`
+- Footprint + auth: `backend/scout/sources/footprint/github_user.py`
 - Footprint + no auth: `backend/scout/sources/footprint/gravatar.py`
 - Threat + auth: `backend/scout/sources/threat/virustotal.py`
 - Threat + no auth: `backend/scout/sources/threat/dns_resolver.py`
@@ -74,7 +74,7 @@ class ExampleSource:
 
 ## Testing
 
-Mirror `backend/tests/test_sources/test_hibp.py`:
+Mirror `backend/tests/test_sources/test_github_user.py`:
 - Mock `httpx` responses with `respx` or project convention
 - Assert nodes, edges, relations, and empty/not-found behavior
 - Test skipped path only if logic lives in source (usually orchestrator handles skip)

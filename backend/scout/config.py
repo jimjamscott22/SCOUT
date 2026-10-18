@@ -12,9 +12,6 @@ TOML layout understood by this module::
     host    = "127.0.0.1"
     port    = 8765
 
-    [sources.hibp]
-    api_key = ""
-
     [sources.virustotal]
     api_key = ""
 
@@ -30,7 +27,7 @@ Usage
 
     cfg = get_config()
     print(cfg.db_path)
-    print(cfg.sources.hibp.api_key)
+    print(cfg.sources.virustotal.api_key)
 
     # CLI helper
     from pathlib import Path
@@ -54,10 +51,6 @@ from pydantic_settings import BaseSettings, PydanticBaseSettingsSource, Settings
 # ---------------------------------------------------------------------------
 
 
-class HibpConfig(BaseModel):
-    api_key: str = ""
-
-
 class VirusTotalConfig(BaseModel):
     api_key: str = ""
 
@@ -71,7 +64,6 @@ class GitHubConfig(BaseModel):
 
 
 class SourcesConfig(BaseModel):
-    hibp: HibpConfig = HibpConfig()
     virustotal: VirusTotalConfig = VirusTotalConfig()
     abuseipdb: AbuseIPDBConfig = AbuseIPDBConfig()
     github: GitHubConfig = GitHubConfig()
@@ -209,9 +201,6 @@ _DEFAULT_TOML = """\
 db_path = "~/.scout/scout.db"
 host    = "127.0.0.1"
 port    = 8765
-
-[sources.hibp]
-api_key = ""
 
 [sources.virustotal]
 api_key = ""
