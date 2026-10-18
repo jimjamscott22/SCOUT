@@ -9,9 +9,11 @@ Full roadmap and design: `docs/SCOUT_PROJECT_PLAN.md`.
 Work happens directly on `main` (the old `feature/mvp-phase1` branch and worktree no longer exist).
 
 **Phase 1 (MVP) is mostly complete:**
-- Done: scaffold, domain models, ORM, config loader, TTL cache, rate limiter, orchestrator, source registry, FastAPI API, CLI (`serve`, `config show`, `config init`), 6 sources (gravatar, github_user, crt_sh, virustotal, abuseipdb, dns_resolver), React frontend scaffold, request validation/normalisation (`scout/validation.py`). Per-source status is shown in `ResultsList.tsx`.
+- Done: scaffold, domain models, ORM, config loader, TTL cache, rate limiter, orchestrator, source registry, FastAPI API, CLI (`serve`, `config show`, `config init`), 6 sources (gravatar, github_user, crt_sh, virustotal, abuseipdb, dns_resolver), React frontend scaffold, request validation/normalisation (`scout/validation.py`). Per-source status is shown in `ResultsList.tsx`. 190 tests pass; `ruff check backend` is clean.
+- Hardening from the Oct 2026 review (all merged to `main`): targets are validated/lowercased per input type before the cache key is built (`validation.py`); `_merge` combines node attrs across sources (first source wins on conflicts); corrupt/failed cache reads fall back to a live fetch; DB engine is built once per process; GitHub token is optional (60 req/hr keyless); frontend shows friendly API errors and an explanation when no nodes come back.
 - Remaining to close out Phase 1:
-  - `ruff check .` and `mypy backend/` report errors (mostly fixable lint issues and missing test annotations)
+  - `mypy backend/` still reports errors (e.g. bare `dict` in `orchestrator.py` `_serialize`/`_deserialize`, `_get_session` return type) plus missing test annotations
+  - Open decision: sanitise `error_message=str(exc)` in `orchestrator._run_one` (httpx errors can include URLs). Also whether a public demo is wanted: the API has no auth, so a hosted instance would spend your VirusTotal/GitHub quotas and expose `GET /api/investigations`. Either use recorded screenshots/GIF, or add a `demo_mode` flag that disables key-backed sources and history listing
   - `whois_rdap` threat source (in the plan's MVP list) not yet written
   - End-to-end smoke test of frontend against backend not yet done
   - FastAPI does not yet serve the built frontend (`frontend/dist`); run Vite separately for now
