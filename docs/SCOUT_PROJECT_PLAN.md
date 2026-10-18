@@ -36,7 +36,7 @@ Every data source is a plugin implementing a common interface, tagged with which
 
 ```python
 class Source(Protocol):
-    name: str                         # "haveibeenpwned"
+    name: str                         # "gravatar"
     modes: set[Mode]                  # {Mode.FOOTPRINT}
     accepts: set[InputType]           # {InputType.EMAIL}
     auth_required: bool
@@ -55,7 +55,7 @@ Node:  id, type (email|domain|ip|hash|url|breach|cert|repo|account), label, attr
 Edge:  src_id, dst_id, relation (exposed_in|resolves_to|owns|references|...), source
 ```
 
-This is what makes the visualization work — Cytoscape doesn't care whether a node came from HIBP or Shodan, it just renders the typed graph.
+This is what makes the visualization work — Cytoscape doesn't care whether a node came from Gravatar or Shodan, it just renders the typed graph.
 
 ### Local-first, single-user
 - SQLite database at `~/.scout/scout.db`
@@ -80,7 +80,6 @@ Each source declares its rate limit and the orchestrator enforces it via `aiolim
 
 | Source | Input | What it returns | Auth | Phase |
 |---|---|---|---|---|
-| HaveIBeenPwned | email | Breach exposures | API key (~$4/mo) | MVP |
 | Gravatar | email | Public profile linked to email | None | MVP |
 | GitHub user API | username | Public repos, gists, social links | PAT (free) | MVP |
 | crt.sh | domain | SSL certs (reveals subdomains) | None | MVP |
@@ -131,7 +130,6 @@ scout/
 │   │   ├── sources/
 │   │   │   ├── base.py             # Source protocol, registry, decorators
 │   │   │   ├── footprint/
-│   │   │   │   ├── hibp.py
 │   │   │   │   ├── gravatar.py
 │   │   │   │   ├── github_user.py
 │   │   │   │   └── crtsh.py
@@ -268,7 +266,7 @@ GET    /api/health
 
 - FastAPI skeleton with SQLite, SQLAlchemy models, Alembic-free migrations (raw SQL for now)
 - Source plugin protocol + registry
-- 3 footprint sources: HIBP, Gravatar, GitHub user
+- 3 footprint sources: Gravatar, GitHub user, crt.sh
 - 3 threat sources: AbuseIPDB, VirusTotal, DNS resolver
 - Orchestrator: parallel fetch, cache hit/miss, rate limiting
 - POST /investigate (synchronous return for MVP — SSE comes in Phase 2)

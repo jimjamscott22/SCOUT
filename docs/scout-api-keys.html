@@ -324,26 +324,6 @@
 
           <tr>
             <td>
-              <span class="source-name">Have I Been Pwned</span>
-              <span class="source-id">haveibeenpwned</span>
-            </td>
-            <td><span class="mode-pill footprint">Footprint</span></td>
-            <td><code>email</code></td>
-            <td class="auth-yes">API key</td>
-            <td class="cost-paid">Paid (~$4/mo)</td>
-            <td><code>[sources.hibp]</code></td>
-            <td><code>api_key</code></td>
-            <td>Per-key HIBP v3 limits</td>
-            <td>
-              <a href="https://haveibeenpwned.com/API/Key" target="_blank" rel="noopener">
-                haveibeenpwned.com/API/Key
-              </a><br />
-              Create account → purchase API key (Pwned 1 tier). Website search ≠ API access.
-            </td>
-          </tr>
-
-          <tr>
-            <td>
               <span class="source-name">Gravatar</span>
               <span class="source-id">gravatar</span>
             </td>
@@ -457,7 +437,7 @@
     <div class="input-grid">
       <div class="input-card">
         <h3>email</h3>
-        <p>Have I Been Pwned · Gravatar</p>
+        <p>Gravatar</p>
       </div>
       <div class="input-card">
         <h3>username</h3>
@@ -491,9 +471,6 @@ db_path = <span class="val">"~/.scout/scout.db"</span>
 host    = <span class="val">"127.0.0.1"</span>
 port    = <span class="val">8765</span>
 
-<span class="key">[sources.hibp]</span>
-api_key = <span class="val">"your-hibp-key"</span>       <span class="cmt"># https://haveibeenpwned.com/API/Key</span>
-
 <span class="key">[sources.virustotal]</span>
 api_key = <span class="val">"your-vt-key"</span>         <span class="cmt"># https://www.virustotal.com/gui/my-apikey</span>
 
@@ -506,14 +483,6 @@ token   = <span class="val">"ghp_..."</span>             <span class="cmt"># htt
 
   <section>
     <h2>Step-by-step: authenticated sources</h2>
-
-    <h3 style="font-size:0.9rem; margin:1rem 0 0.5rem; color:var(--green);">Have I Been Pwned (paid)</h3>
-    <ul>
-      <li>Register at <a href="https://haveibeenpwned.com">haveibeenpwned.com</a></li>
-      <li>Go to <strong>API Key</strong> and purchase the Pwned 1 monthly tier</li>
-      <li>Copy key → <code>[sources.hibp] api_key</code></li>
-      <li>Header sent: <code>hibp-api-key</code></li>
-    </ul>
 
     <h3 style="font-size:0.9rem; margin:1rem 0 0.5rem; color:var(--green);">VirusTotal (free)</h3>
     <ul>
@@ -547,7 +516,6 @@ token   = <span class="val">"ghp_..."</span>             <span class="cmt"># htt
       <li><strong>Zero cost:</strong> Gravatar, crt.sh, DNS resolver work with no keys</li>
       <li><strong>Free keys first:</strong> VirusTotal + AbuseIPDB unlock full threat-mode IP lookups</li>
       <li><strong>GitHub token:</strong> Unlocks footprint username investigations</li>
-      <li><strong>HIBP last:</strong> Only paid source; add when you need breach data for emails you own</li>
     </ul>
     <div class="callout">
       <strong>Security:</strong> Keep <code>config.toml</code> private. SCOUT binds to

@@ -56,7 +56,6 @@ scout/
 │   │   │   ├── base.py      # Source protocol, @register decorator, REGISTRY
 │   │   │   ├── footprint/
 │   │   │   │   ├── __init__.py
-│   │   │   │   ├── hibp.py
 │   │   │   │   ├── gravatar.py
 │   │   │   │   └── github_user.py
 │   │   │   └── threat/
@@ -223,7 +222,6 @@ MVP returns synchronously (no SSE — that's Phase 2). The frontend shows a spin
 Implement these six. **For any source requiring an API key that isn't configured, the source must return an empty SourceResult and the SourceRun records status='skipped' with a clear error message — never crash the investigation.**
 
 ### Footprint
-- **`hibp.py`** — `https://haveibeenpwned.com/api/v3/breachedaccount/{email}?truncateResponse=false`. Header `hibp-api-key`, `user-agent: scout-osint`. 429-aware. Each breach → `BREACH` node, edge `email --exposed_in--> breach`.
 - **`gravatar.py`** — md5 the email lowercased, GET `https://en.gravatar.com/{hash}.json`. 404 means no profile (return empty, not error). Profile → `ACCOUNT` node with display name + linked URLs.
 - **`github_user.py`** — `https://api.github.com/users/{username}` and `/users/{username}/repos?per_page=30`. Token via `Authorization: Bearer`. User → `ACCOUNT` node. Each repo → `REPO` node, edge `username --owns--> repo`.
 
@@ -241,9 +239,6 @@ Implement these six. **For any source requiring an API key that isn't configured
 db_path = "~/.scout/scout.db"
 host = "127.0.0.1"
 port = 8765
-
-[sources.hibp]
-api_key = ""
 
 [sources.virustotal]
 api_key = ""

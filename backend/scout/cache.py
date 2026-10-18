@@ -16,8 +16,8 @@ Usage::
     init_db(engine)
     cache = ResponseCache(get_session_factory(engine))
 
-    cache.set("hibp", "email:foo@bar.com", {"breaches": []}, ttl_seconds=86400)
-    data = cache.get("hibp", "email:foo@bar.com")   # dict or None
+    cache.set("gravatar", "email:foo@bar.com", {"profile": {}}, ttl_seconds=86400)
+    data = cache.get("gravatar", "email:foo@bar.com")   # dict or None
     cache.evict_expired()
 """
 
